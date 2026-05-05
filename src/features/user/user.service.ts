@@ -69,8 +69,8 @@ export class UserService implements IUserService {
   }
 
   private withoutPassword(user: UserEntity): Omit<UserEntity, 'passwordHash'> {
-    const safeUser = { ...user };
-    delete safeUser.passwordHash;
+    const { passwordHash, ...safeUser } = user;
+    void passwordHash;
     return safeUser;
   }
 }
