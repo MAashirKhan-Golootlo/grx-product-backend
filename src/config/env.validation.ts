@@ -64,6 +64,14 @@ class EnvironmentVariables {
   @IsOptional()
   @IsBooleanString()
   DB_LOGGING?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  JWT_SECRET!: string;
+
+  @IsOptional()
+  @IsString()
+  JWT_EXPIRES_IN?: string;
 }
 
 export function validateEnv(

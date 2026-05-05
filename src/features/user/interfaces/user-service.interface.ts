@@ -3,8 +3,13 @@ import type { UpdateUserDto } from '../dto/update-user.dto';
 import type { UserEntity } from '../entities/user.entity';
 
 export interface IUserService {
-  create(createUserDto: CreateUserDto): UserEntity;
-  findAll(): UserEntity[];
-  findOne(id: string): UserEntity;
-  update(id: string, updateUserDto: UpdateUserDto): UserEntity;
+  create(
+    createUserDto: CreateUserDto,
+  ): Promise<Omit<UserEntity, 'passwordHash'>>;
+  findAll(): Promise<Array<Omit<UserEntity, 'passwordHash'>>>;
+  findOne(id: string): Promise<Omit<UserEntity, 'passwordHash'>>;
+  update(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<Omit<UserEntity, 'passwordHash'>>;
 }

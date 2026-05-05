@@ -17,4 +17,8 @@ export default (): Record<string, unknown> => ({
     synchronize: process.env.DB_SYNCHRONIZE === 'true',
     logging: process.env.DB_LOGGING === 'true',
   },
+  auth: {
+    jwtSecret: process.env.JWT_SECRET ?? 'change-this-secret',
+    jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '1d',
+  },
 });

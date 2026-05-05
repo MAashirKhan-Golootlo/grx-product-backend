@@ -19,14 +19,16 @@ export class UserController {
   @Post()
   @ApiOperation({ summary: 'Create a new user' })
   @ApiCreatedResponse({ type: UserEntity })
-  public create(@Body() createUserDto: CreateUserDto): UserEntity {
+  public create(
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<Omit<UserEntity, 'passwordHash'>> {
     return this.userService.create(createUserDto);
   }
 
   @Get()
   @ApiOperation({ summary: 'Get all users' })
   @ApiOkResponse({ type: [UserEntity] })
-  public findAll(): UserEntity[] {
+  public findAll(): Promise<Array<Omit<UserEntity, 'passwordHash'>>> {
     return this.userService.findAll();
   }
 
@@ -34,7 +36,9 @@ export class UserController {
   @ApiOperation({ summary: 'Get user by id' })
   @ApiParam({ name: 'id', type: String })
   @ApiOkResponse({ type: UserEntity })
-  public findOne(@Param('id') id: string): UserEntity {
+  public findOne(
+    @Param('id') id: string,
+  ): Promise<Omit<UserEntity, 'passwordHash'>> {
     return this.userService.findOne(id);
   }
 
@@ -45,7 +49,7 @@ export class UserController {
   public update(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
-  ): UserEntity {
+  ): Promise<Omit<UserEntity, 'passwordHash'>> {
     return this.userService.update(id, updateUserDto);
   }
 }
