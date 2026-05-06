@@ -15,6 +15,11 @@ export class CreateProductDto {
   @IsString()
   description?: string;
 
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  imageUrl?: string;
+
   @ApiProperty({ example: 1000 })
   @IsNumber()
   @Min(0)

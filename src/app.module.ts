@@ -13,6 +13,7 @@ import { PartnerModule } from './features/partner/partner.module';
 import { PartnerProductModule } from './features/partner-product/partner-product.module';
 import { ProductModule } from './features/product/product.module';
 import { TenantModule } from './features/tenant/tenant.module';
+import { UploadModule } from './features/upload/upload.module';
 import { UserModule } from './features/user/user.module';
 
 @Module({
@@ -33,6 +34,7 @@ import { UserModule } from './features/user/user.module';
     PartnerModule,
     PartnerProductModule,
     OrderModule,
+    UploadModule,
   ],
   providers: [
     {

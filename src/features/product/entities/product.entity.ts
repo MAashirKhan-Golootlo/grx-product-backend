@@ -29,6 +29,10 @@ export class ProductEntity {
   @Column({ type: 'text', nullable: true })
   description?: string;
 
+  @ApiProperty({ required: false })
+  @Column({ type: 'text', nullable: true })
+  imageUrl?: string;
+
   @ApiProperty()
   @Column('decimal', { precision: 12, scale: 2 })
   basePrice!: number;

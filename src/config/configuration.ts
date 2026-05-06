@@ -21,4 +21,7 @@ export default (): Record<string, unknown> => ({
     jwtSecret: process.env.JWT_SECRET ?? 'change-this-secret',
     jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '1d',
   },
+  cors: {
+    origin: process.env.CORS_ORIGIN ?? 'http://localhost:3000',
+  },
 });
