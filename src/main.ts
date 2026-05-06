@@ -36,7 +36,8 @@ async function bootstrap(): Promise<void> {
       configService.get<string>('app.description', 'API documentation'),
     )
     .setVersion(configService.get<string>('app.version', '1.0.0'))
-    .addBearerAuth()
+    .addBearerAuth(undefined, 'bearer')
+    .addSecurityRequirements('bearer')
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api/docs', app, document);
