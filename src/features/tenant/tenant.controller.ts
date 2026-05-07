@@ -1,9 +1,21 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { CreateTenantDto } from './dto/create-tenant.dto';
 import { UpdateTenantDto } from './dto/update-tenant.dto';
 import { TenantEntity } from './entities/tenant.entity';
-import { TenantService } from './tenant.service';
+import {
+  TenantCreateResult,
+  TenantIntegrationCredentialsResult,
+  TenantService,
+} from './tenant.service';
 
 @ApiTags('Tenants')
 @Controller('tenants')
@@ -11,8 +23,26 @@ export class TenantController {
   public constructor(private readonly tenantService: TenantService) {}
 
   @Post()
-  @ApiCreatedResponse({ type: TenantEntity })
-  public create(@Body() dto: CreateTenantDto): Promise<TenantEntity> {
+  @ApiCreatedResponse({
+    schema: {
+      example: {
+        tenant: {
+          id: 101,
+          code: 'wallet_a',
+          name: 'Wallet A',
+          integrationEnabled: true,
+          status: 'active',
+          createdAt: '2026-05-07T00:00:00.000Z',
+          updatedAt: '2026-05-07T00:00:00.000Z',
+        },
+        integrationCredentials: {
+          clientId: 101,
+          clientSecret: 'one-time-secret',
+        },
+      },
+    },
+  })
+  public create(@Body() dto: CreateTenantDto): Promise<TenantCreateResult> {
     return this.tenantService.create(dto);
   }
 
@@ -24,14 +54,29 @@ export class TenantController {
 
   @Get(':id')
   @ApiOkResponse({ type: TenantEntity })
-  public findOne(@Param('id') id: string): Promise<TenantEntity> {
+  public findOne(@Param('id', ParseIntPipe) id: number): Promise<TenantEntity> {
     return this.tenantService.findOne(id);
+  }
+
+  @Get(':id/integration-credentials')
+  @ApiOkResponse({
+    schema: {
+      example: {
+        clientId: 101,
+        clientSecret: 'one-time-secret',
+      },
+    },
+  })
+  public getIntegrationCredentials(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<TenantIntegrationCredentialsResult> {
+    return this.tenantService.getIntegrationCredentials(id);
   }
 
   @Patch(':id')
   @ApiOkResponse({ type: TenantEntity })
   public update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateTenantDto,
   ): Promise<TenantEntity> {
     return this.tenantService.update(id, dto);

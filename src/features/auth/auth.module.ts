@@ -5,12 +5,12 @@ import type { StringValue } from 'ms';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { AuthAccountEntity } from './entities/auth-account.entity';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { UserEntity } from '../user/entities/user.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AuthAccountEntity]),
+    TypeOrmModule.forFeature([UserEntity]),
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({

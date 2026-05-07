@@ -25,7 +25,7 @@ export class OrderEntity {
   orderNo!: string;
 
   @Column()
-  tenantId!: string;
+  tenantId!: number;
 
   @Column()
   partnerId!: string;

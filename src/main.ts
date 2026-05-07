@@ -52,6 +52,13 @@ async function bootstrap(): Promise<void> {
       configService.get<string>('app.description', 'API documentation'),
     )
     .setVersion(configService.get<string>('app.version', '1.0.0'))
+    .addBasicAuth(
+      {
+        type: 'http',
+        scheme: 'basic',
+      },
+      'tenant-basic',
+    )
     .addBearerAuth(undefined, 'bearer')
     .addSecurityRequirements('bearer')
     .build();

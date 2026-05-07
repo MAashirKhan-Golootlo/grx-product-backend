@@ -14,7 +14,7 @@ export class InitSchema1777989229481 implements MigrationInterface {
       `CREATE TYPE "public"."tenants_status_enum" AS ENUM('active', 'inactive')`,
     );
     await queryRunner.query(
-      `CREATE TABLE "tenants" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "code" character varying NOT NULL, "name" character varying NOT NULL, "status" "public"."tenants_status_enum" NOT NULL DEFAULT 'active', "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "UQ_3021c18db2b363ae9324c826c5a" UNIQUE ("code"), CONSTRAINT "PK_53be67a04681c66b87ee27c9321" PRIMARY KEY ("id"))`,
+      `CREATE TABLE "tenants" ("id" SERIAL NOT NULL, "code" character varying NOT NULL, "name" character varying NOT NULL, "status" "public"."tenants_status_enum" NOT NULL DEFAULT 'active', "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "UQ_3021c18db2b363ae9324c826c5a" UNIQUE ("code"), CONSTRAINT "PK_53be67a04681c66b87ee27c9321" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `CREATE TYPE "public"."categories_status_enum" AS ENUM('active', 'inactive')`,
@@ -38,13 +38,13 @@ export class InitSchema1777989229481 implements MigrationInterface {
       `CREATE TYPE "public"."orders_status_enum" AS ENUM('created', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'failed')`,
     );
     await queryRunner.query(
-      `CREATE TABLE "orders" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "orderNo" character varying NOT NULL, "tenantId" uuid NOT NULL, "partnerId" uuid NOT NULL, "status" "public"."orders_status_enum" NOT NULL DEFAULT 'created', "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "UQ_9e116d4adfd60229dc662a81b03" UNIQUE ("orderNo"), CONSTRAINT "PK_710e2d4957aa5878dfe94e4ac2f" PRIMARY KEY ("id"))`,
+      `CREATE TABLE "orders" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "orderNo" character varying NOT NULL, "tenantId" integer NOT NULL, "partnerId" uuid NOT NULL, "status" "public"."orders_status_enum" NOT NULL DEFAULT 'created', "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "UQ_9e116d4adfd60229dc662a81b03" UNIQUE ("orderNo"), CONSTRAINT "PK_710e2d4957aa5878dfe94e4ac2f" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `CREATE TABLE "order_items" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "productId" uuid NOT NULL, "quantity" integer NOT NULL, "unitPrice" numeric(12,2) NOT NULL, "orderId" uuid, CONSTRAINT "PK_005269d8574e6fac0493715c308" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
-      `CREATE TABLE "partner_products" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "partnerId" uuid NOT NULL, "productId" uuid NOT NULL, "tenantId" uuid, "allocatedStock" integer NOT NULL DEFAULT '0', "availableStock" integer NOT NULL DEFAULT '0', "partnerPrice" numeric(12,2) NOT NULL, "currency" character varying(3) NOT NULL DEFAULT 'PKR', "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "UQ_f899705965319921b3b703d4914" UNIQUE ("partnerId", "productId", "tenantId"), CONSTRAINT "PK_ae569306e9f6ab2144d00f8840d" PRIMARY KEY ("id"))`,
+      `CREATE TABLE "partner_products" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "partnerId" uuid NOT NULL, "productId" uuid NOT NULL, "tenantId" integer, "allocatedStock" integer NOT NULL DEFAULT '0', "availableStock" integer NOT NULL DEFAULT '0', "partnerPrice" numeric(12,2) NOT NULL, "currency" character varying(3) NOT NULL DEFAULT 'PKR', "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "UQ_f899705965319921b3b703d4914" UNIQUE ("partnerId", "productId", "tenantId"), CONSTRAINT "PK_ae569306e9f6ab2144d00f8840d" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `CREATE TYPE "public"."stock_movements_type_enum" AS ENUM('consume', 'release', 'adjust')`,
@@ -54,9 +54,6 @@ export class InitSchema1777989229481 implements MigrationInterface {
     );
     await queryRunner.query(
       `CREATE TABLE "partner_api_keys" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "partnerId" uuid NOT NULL, "keyPrefix" character varying NOT NULL, "keyHash" character varying NOT NULL, "isActive" boolean NOT NULL DEFAULT true, "expiresAt" TIMESTAMP, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_414d0b464f3d7e36ffb871030a0" PRIMARY KEY ("id"))`,
-    );
-    await queryRunner.query(
-      `CREATE TABLE "auth_accounts" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "email" character varying NOT NULL, "fullName" character varying NOT NULL, "passwordHash" character varying NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "UQ_68ef151103dbf5e7e9932972b26" UNIQUE ("email"), CONSTRAINT "PK_8c9dc84256aeaa852e4d87d782b" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `ALTER TABLE "products" ADD CONSTRAINT "FK_ff56834e735fa78a15d0cf21926" FOREIGN KEY ("categoryId") REFERENCES "categories"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
@@ -127,7 +124,6 @@ export class InitSchema1777989229481 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE "products" DROP CONSTRAINT "FK_ff56834e735fa78a15d0cf21926"`,
     );
-    await queryRunner.query(`DROP TABLE "auth_accounts"`);
     await queryRunner.query(`DROP TABLE "partner_api_keys"`);
     await queryRunner.query(`DROP TABLE "stock_movements"`);
     await queryRunner.query(`DROP TYPE "public"."stock_movements_type_enum"`);

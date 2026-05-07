@@ -15,6 +15,7 @@ import { ProductModule } from './features/product/product.module';
 import { TenantModule } from './features/tenant/tenant.module';
 import { UploadModule } from './features/upload/upload.module';
 import { UserModule } from './features/user/user.module';
+import { IntegrationModule } from './features/integration/integration.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { UserModule } from './features/user/user.module';
     PartnerProductModule,
     OrderModule,
     UploadModule,
+    IntegrationModule,
   ],
   providers: [
     {
