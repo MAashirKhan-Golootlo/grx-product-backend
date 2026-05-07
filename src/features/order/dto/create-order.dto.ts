@@ -2,13 +2,29 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   ArrayMinSize,
   IsArray,
+  IsEmail,
   IsInt,
   IsNumber,
+  IsOptional,
   IsString,
   Min,
   ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
+
+/** Used by @Transform — explicit return type satisfies @typescript-eslint/no-unsafe-return */
+function transformEmptyStringToUndefined(params: {
+  value: unknown;
+}): string | undefined {
+  const { value } = params;
+  if (value === '' || value === null || value === undefined) {
+    return undefined;
+  }
+  if (typeof value === 'string') {
+    return value;
+  }
+  return undefined;
+}
 
 class CreateOrderItemDto {
   @ApiProperty()
@@ -35,6 +51,30 @@ export class CreateOrderDto {
   @ApiProperty()
   @IsString()
   partnerId!: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @Transform(transformEmptyStringToUndefined)
+  @IsString()
+  customerId?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @Transform(transformEmptyStringToUndefined)
+  @IsString()
+  customerName?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @Transform(transformEmptyStringToUndefined)
+  @IsString()
+  customerPhone?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @Transform(transformEmptyStringToUndefined)
+  @IsEmail()
+  customerEmail?: string;
 
   @ApiProperty({ type: [CreateOrderItemDto] })
   @IsArray()

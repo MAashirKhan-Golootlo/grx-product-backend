@@ -26,6 +26,10 @@ export class OrderService {
         orderNo: `ORD-${randomUUID().split('-')[0].toUpperCase()}`,
         tenantId: dto.tenantId,
         partnerId: dto.partnerId,
+        customerId: dto.customerId,
+        customerName: dto.customerName,
+        customerPhone: dto.customerPhone,
+        customerEmail: dto.customerEmail,
         items: dto.items,
       });
       const savedOrder = await manager.save(order);

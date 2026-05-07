@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   ArrayMinSize,
   IsArray,
+  IsEmail,
   IsInt,
   IsNumber,
   IsOptional,
@@ -32,6 +33,22 @@ export class CreateIntegrationOrderDto {
   @ApiProperty()
   @IsString()
   partnerId!: string;
+
+  @ApiProperty({ example: 'ext-cust-5501' })
+  @IsString()
+  customerId!: string;
+
+  @ApiProperty({ example: 'Ali Khan' })
+  @IsString()
+  customerName!: string;
+
+  @ApiProperty({ example: '+923001234567' })
+  @IsString()
+  customerPhone!: string;
+
+  @ApiProperty({ example: 'ali@example.com' })
+  @IsEmail()
+  customerEmail!: string;
 
   @ApiProperty({ type: [CreateIntegrationOrderItemDto] })
   @IsArray()

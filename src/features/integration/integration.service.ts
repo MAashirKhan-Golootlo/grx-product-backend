@@ -110,6 +110,10 @@ export class IntegrationService {
     const createOrderDto: CreateOrderDto = {
       tenantId: tenant.id,
       partnerId: dto.partnerId,
+      customerId: dto.customerId,
+      customerName: dto.customerName,
+      customerPhone: dto.customerPhone,
+      customerEmail: dto.customerEmail,
       items: normalizedItems,
     };
     return this.orderService.create(createOrderDto);

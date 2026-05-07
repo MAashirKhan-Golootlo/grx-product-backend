@@ -34,6 +34,22 @@ export class OrderEntity {
   @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.CREATED })
   status!: OrderStatus;
 
+  @ApiProperty({ required: false })
+  @Column({ type: 'varchar', nullable: true })
+  customerId?: string | null;
+
+  @ApiProperty({ required: false })
+  @Column({ type: 'varchar', nullable: true })
+  customerName?: string | null;
+
+  @ApiProperty({ required: false })
+  @Column({ type: 'varchar', nullable: true })
+  customerPhone?: string | null;
+
+  @ApiProperty({ required: false })
+  @Column({ type: 'varchar', nullable: true })
+  customerEmail?: string | null;
+
   @ManyToOne(() => TenantEntity, { eager: true })
   @JoinColumn({ name: 'tenantId' })
   tenant!: TenantEntity;
