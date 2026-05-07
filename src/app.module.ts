@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
-import { ConfigModule } from '@nestjs/config';
 import { CategoryModule } from './features/category/category.module';
 import { LoggerModule } from './common/logger/logger.module';
 import configuration from './config/configuration';
@@ -25,6 +26,18 @@ import { IntegrationModule } from './features/integration/integration.module';
       load: [configuration],
       validate: validateEnv,
     }),
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        throttlers: [
+          {
+            ttl: configService.get<number>('throttle.ttlMs', 60_000),
+            limit: configService.get<number>('throttle.limit', 150),
+          },
+        ],
+      }),
+    }),
     DatabaseModule,
     LoggerModule,
     UserModule,
@@ -39,6 +52,10 @@ import { IntegrationModule } from './features/integration/integration.module';
     IntegrationModule,
   ],
   providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,

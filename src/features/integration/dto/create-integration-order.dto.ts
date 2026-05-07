@@ -12,8 +12,8 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
-class CreateIntegrationOrderItemDto {
-  @ApiProperty()
+export class CreateIntegrationOrderItemDto {
+  @ApiProperty({ example: '64616cb5-aa2d-44ee-b0e9-31f9672f2e30' })
   @IsString()
   productId!: string;
 
@@ -22,7 +22,11 @@ class CreateIntegrationOrderItemDto {
   @Min(1)
   quantity!: number;
 
-  @ApiProperty({ example: 1000, required: false })
+  @ApiProperty({
+    example: 1800,
+    required: false,
+    description: 'Optional; defaults to partner price for this product/tenant',
+  })
   @IsOptional()
   @IsNumber()
   @Min(0)
@@ -30,11 +34,17 @@ class CreateIntegrationOrderItemDto {
 }
 
 export class CreateIntegrationOrderDto {
-  @ApiProperty()
+  @ApiProperty({
+    example: '7f5b5f2a-12c3-44b9-bec0-0e85f9df2cce',
+    description: 'Partner UUID',
+  })
   @IsString()
   partnerId!: string;
 
-  @ApiProperty({ example: 'ext-cust-5501' })
+  @ApiProperty({
+    example: 'wallet-user-5501',
+    description: 'External / tenant customer identifier',
+  })
   @IsString()
   customerId!: string;
 
@@ -50,7 +60,11 @@ export class CreateIntegrationOrderDto {
   @IsEmail()
   customerEmail!: string;
 
-  @ApiProperty({ type: [CreateIntegrationOrderItemDto] })
+  @ApiProperty({
+    type: CreateIntegrationOrderItemDto,
+    isArray: true,
+    description: 'At least one line item',
+  })
   @IsArray()
   @ArrayMinSize(1)
   @ValidateNested({ each: true })

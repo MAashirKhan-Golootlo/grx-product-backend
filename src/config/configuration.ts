@@ -24,4 +24,8 @@ export default (): Record<string, unknown> => ({
   cors: {
     origin: process.env.CORS_ORIGIN ?? 'http://localhost:3000',
   },
+  throttle: {
+    ttlMs: Number(process.env.THROTTLE_TTL_MS ?? 60_000),
+    limit: Number(process.env.THROTTLE_LIMIT ?? 150),
+  },
 });

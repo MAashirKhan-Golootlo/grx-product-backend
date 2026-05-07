@@ -18,6 +18,9 @@ async function bootstrap(): Promise<void> {
   const configService = app.get(ConfigService);
 
   app.useLogger(logger);
+  if (process.env.TRUST_PROXY === 'true') {
+    app.set('trust proxy', 1);
+  }
   app.setGlobalPrefix('api');
 
   const corsOrigin =
