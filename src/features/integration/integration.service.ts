@@ -9,17 +9,32 @@ import { TenantEntity } from '../tenant/entities/tenant.entity';
 import { CreateIntegrationOrderDto } from './dto/create-integration-order.dto';
 
 export interface IntegrationProductResponse {
-  partnerProductId: string;
+  id: string;
   partnerId: string;
-  productId: string;
+  productId: {
+    id: string;
+    sku: string;
+    name: string;
+    description: string | null;
+    imageUrl: string | null;
+    category: {
+      id: string;
+      slug: string;
+      name: string;
+    };
+  };
   tenantId: number | null;
-  sku: string;
-  name: string;
-  description: string | null;
-  imageUrl: string | null;
-  price: number;
-  currency: string;
+  allocatedStock: number;
   availableStock: number;
+  partnerPrice: number;
+  currency: string;
+  partner: {
+    id: string;
+    code: string;
+    name: string;
+    contactEmail: string;
+    status: string;
+  };
 }
 
 @Injectable()
@@ -52,17 +67,32 @@ export class IntegrationService {
     }
 
     return [...deduped.values()].map((row) => ({
-      partnerProductId: row.id,
+      id: row.id,
       partnerId: row.partnerId,
-      productId: row.productId,
+      productId: {
+        id: row.productId,
+        sku: row.product.sku,
+        name: row.product.name,
+        description: row.product.description ?? null,
+        imageUrl: row.product.imageUrl ?? null,
+        category: {
+          id: row.product.category.id,
+          slug: row.product.category.slug,
+          name: row.product.category.name,
+        },
+      },
       tenantId: row.tenantId ?? null,
-      sku: row.product.sku,
-      name: row.product.name,
-      description: row.product.description ?? null,
-      imageUrl: row.product.imageUrl ?? null,
-      price: Number(row.partnerPrice),
-      currency: row.currency,
+      allocatedStock: row.allocatedStock,
       availableStock: row.availableStock,
+      partnerPrice: Number(row.partnerPrice),
+      currency: row.currency,
+      partner: {
+        id: row.partner.id,
+        code: row.partner.code,
+        name: row.partner.name,
+        contactEmail: row.partner.contactEmail,
+        status: row.partner.status,
+      },
     }));
   }
 
