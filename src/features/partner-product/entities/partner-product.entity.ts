@@ -26,8 +26,8 @@ export class PartnerProductEntity {
   @Column()
   productId!: string;
 
-  @Column({ type: 'uuid', nullable: true })
-  tenantId?: string;
+  @Column({ nullable: true })
+  tenantId?: number;
 
   @ApiProperty()
   @Column({ type: 'int', default: 0 })

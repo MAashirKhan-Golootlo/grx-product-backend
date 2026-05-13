@@ -11,8 +11,8 @@ import { RecordStatus } from '../../../shared/enums';
 @Entity('tenants')
 export class TenantEntity {
   @ApiProperty()
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
+  @PrimaryGeneratedColumn('increment')
+  id!: number;
 
   @ApiProperty()
   @Column({ unique: true })

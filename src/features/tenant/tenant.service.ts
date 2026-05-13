@@ -20,13 +20,13 @@ import { TenantEntity } from './entities/tenant.entity';
 export interface TenantCreateResult {
   tenant: TenantEntity;
   integrationCredentials: {
-    clientId: string;
+    clientId: number;
     clientSecret: string;
   };
 }
 
 export interface TenantIntegrationCredentialsResult {
-  clientId: string;
+  clientId: number;
   clientSecret: string;
 }
 
@@ -68,14 +68,14 @@ export class TenantService {
     return this.tenantRepository.find({ order: { createdAt: 'DESC' } });
   }
 
-  public async findOne(id: string): Promise<TenantEntity> {
+  public async findOne(id: number): Promise<TenantEntity> {
     const tenant = await this.tenantRepository.findOneBy({ id });
     if (!tenant) throw new NotFoundException(`Tenant ${id} not found`);
     return tenant;
   }
 
   public async update(
-    id: string,
+    id: number,
     updateTenantDto: UpdateTenantDto,
   ): Promise<TenantEntity> {
     const tenant = await this.findOne(id);
@@ -85,7 +85,7 @@ export class TenantService {
   }
 
   public async findByIntegrationCredentials(
-    clientId: string,
+    clientId: number,
     clientSecret: string,
   ): Promise<TenantEntity | null> {
     const tenant = await this.tenantRepository
@@ -110,7 +110,7 @@ export class TenantService {
   }
 
   public async getIntegrationCredentials(
-    id: string,
+    id: number,
   ): Promise<TenantIntegrationCredentialsResult> {
     const tenant = await this.tenantRepository
       .createQueryBuilder('tenant')

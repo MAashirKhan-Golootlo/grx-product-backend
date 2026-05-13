@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { CreateTenantDto } from './dto/create-tenant.dto';
 import { UpdateTenantDto } from './dto/update-tenant.dto';
@@ -46,7 +54,7 @@ export class TenantController {
 
   @Get(':id')
   @ApiOkResponse({ type: TenantEntity })
-  public findOne(@Param('id') id: string): Promise<TenantEntity> {
+  public findOne(@Param('id', ParseIntPipe) id: number): Promise<TenantEntity> {
     return this.tenantService.findOne(id);
   }
 
@@ -60,7 +68,7 @@ export class TenantController {
     },
   })
   public getIntegrationCredentials(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
   ): Promise<TenantIntegrationCredentialsResult> {
     return this.tenantService.getIntegrationCredentials(id);
   }
@@ -68,7 +76,7 @@ export class TenantController {
   @Patch(':id')
   @ApiOkResponse({ type: TenantEntity })
   public update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateTenantDto,
   ): Promise<TenantEntity> {
     return this.tenantService.update(id, dto);

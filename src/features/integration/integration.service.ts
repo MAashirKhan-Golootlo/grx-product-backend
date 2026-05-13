@@ -23,7 +23,7 @@ export interface IntegrationProductResponse {
       name: string;
     };
   };
-  tenantId: string | null;
+  tenantId: number | null;
   allocatedStock: number;
   availableStock: number;
   partnerPrice: number;
