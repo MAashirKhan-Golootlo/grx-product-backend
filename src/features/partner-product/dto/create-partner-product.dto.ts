@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
 export class CreatePartnerProductDto {
   @ApiProperty()
@@ -13,9 +12,8 @@ export class CreatePartnerProductDto {
 
   @ApiProperty({ required: false })
   @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  tenantId?: number;
+  @IsString()
+  tenantId?: string;
 
   @ApiProperty({ example: 100 })
   @IsNumber()

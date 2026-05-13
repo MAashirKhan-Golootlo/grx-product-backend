@@ -44,9 +44,8 @@ class CreateOrderItemDto {
 
 export class CreateOrderDto {
   @ApiProperty()
-  @Type(() => Number)
-  @IsInt()
-  tenantId!: number;
+  @IsString()
+  tenantId!: string;
 
   @ApiProperty()
   @IsString()

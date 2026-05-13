@@ -28,10 +28,9 @@ export class TenantIntegrationAuthGuard implements CanActivate {
       throw new UnauthorizedException('Invalid Basic Authorization format');
     }
 
-    const clientIdRaw = decoded.slice(0, separatorIndex);
+    const clientId = decoded.slice(0, separatorIndex);
     const clientSecret = decoded.slice(separatorIndex + 1);
-    const clientId = Number(clientIdRaw);
-    if (!Number.isInteger(clientId) || clientId <= 0 || !clientSecret) {
+    if (!clientId || !clientSecret) {
       throw new UnauthorizedException('Invalid integration credentials');
     }
 
