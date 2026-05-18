@@ -182,4 +182,26 @@ export class IntegrationService {
     };
     return this.orderService.create(createOrderDto);
   }
+
+  public async getOrderForTenant(
+    tenant: TenantEntity,
+    orderId: string,
+  ): Promise<OrderEntity> {
+    const order = await this.orderService.findOne(orderId);
+    if (order.tenantId !== tenant.id) {
+      throw new NotFoundException(`Order ${orderId} not found`);
+    }
+    return order;
+  }
+
+  public async getOrderByOrderNoForTenant(
+    tenant: TenantEntity,
+    orderNo: string,
+  ): Promise<OrderEntity> {
+    const order = await this.orderService.findByOrderNo(orderNo);
+    if (!order || order.tenantId !== tenant.id) {
+      throw new NotFoundException(`Order ${orderNo} not found`);
+    }
+    return order;
+  }
 }

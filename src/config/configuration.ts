@@ -28,4 +28,9 @@ export default (): Record<string, unknown> => ({
     ttlMs: Number(process.env.THROTTLE_TTL_MS ?? 60_000),
     limit: Number(process.env.THROTTLE_LIMIT ?? 150),
   },
+  loyalty: {
+    webhookUrl: process.env.LOYALTY_WEBHOOK_URL ?? '',
+    webhookSecret: process.env.LOYALTY_WEBHOOK_SECRET ?? '',
+    webhookTimeoutMs: process.env.LOYALTY_WEBHOOK_TIMEOUT_MS ?? '10000',
+  },
 });
