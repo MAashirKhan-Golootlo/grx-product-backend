@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBasicAuth,
   ApiBody,
@@ -113,5 +121,34 @@ export class IntegrationController {
     @Body() dto: CreateIntegrationOrderDto,
   ): Promise<OrderEntity> {
     return this.integrationService.placeOrder(req.tenant, dto);
+  }
+
+  @Get('orders/by-no/:orderNo')
+  @Public()
+  @UseGuards(TenantIntegrationAuthGuard)
+  @Throttle({ default: { limit: 120, ttl: 60_000 } })
+  @ApiOperation({ summary: 'Get order by order number for tenant integration' })
+  @ApiOkResponse({ type: OrderEntity })
+  public getOrderByNo(
+    @Req() req: IntegrationRequest,
+    @Param('orderNo') orderNo: string,
+  ): Promise<OrderEntity> {
+    return this.integrationService.getOrderByOrderNoForTenant(
+      req.tenant,
+      orderNo,
+    );
+  }
+
+  @Get('orders/:id')
+  @Public()
+  @UseGuards(TenantIntegrationAuthGuard)
+  @Throttle({ default: { limit: 120, ttl: 60_000 } })
+  @ApiOperation({ summary: 'Get order by id for tenant integration' })
+  @ApiOkResponse({ type: OrderEntity })
+  public getOrder(
+    @Req() req: IntegrationRequest,
+    @Param('id') id: string,
+  ): Promise<OrderEntity> {
+    return this.integrationService.getOrderForTenant(req.tenant, id);
   }
 }

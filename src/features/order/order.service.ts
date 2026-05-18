@@ -11,6 +11,7 @@ import { OrderEntity } from './entities/order.entity';
 import { OrderStatus, StockMovementType } from '../../shared/enums';
 import { PartnerProductEntity } from '../partner-product/entities/partner-product.entity';
 import { StockMovementEntity } from '../partner-product/entities/stock-movement.entity';
+import { LoyaltyWebhookService } from '../loyalty-webhook/loyalty-webhook.service';
 
 @Injectable()
 export class OrderService {
@@ -18,6 +19,7 @@ export class OrderService {
     @InjectRepository(OrderEntity)
     private readonly orderRepository: Repository<OrderEntity>,
     private readonly dataSource: DataSource,
+    private readonly loyaltyWebhook: LoyaltyWebhookService,
   ) {}
 
   public async create(dto: CreateOrderDto): Promise<OrderEntity> {
@@ -99,6 +101,10 @@ export class OrderService {
     return order;
   }
 
+  public async findByOrderNo(orderNo: string): Promise<OrderEntity | null> {
+    return this.orderRepository.findOneBy({ orderNo });
+  }
+
   public async updateStatus(
     id: string,
     status: OrderStatus,
@@ -159,7 +165,14 @@ export class OrderService {
         }
       }
 
-      return manager.save(order);
+      const saved = await manager.save(order);
+      if (previousStatus !== status) {
+        void this.loyaltyWebhook.notifyOrderStatusChanged(
+          saved,
+          previousStatus,
+        );
+      }
+      return saved;
     });
   }
 }
