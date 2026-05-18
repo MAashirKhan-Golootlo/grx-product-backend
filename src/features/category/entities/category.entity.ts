@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   Column,
   CreateDateColumn,
@@ -21,6 +21,10 @@ export class CategoryEntity {
   @ApiProperty()
   @Column()
   name!: string;
+
+  @ApiPropertyOptional()
+  @Column({ nullable: true, default: null })
+  imageUrl?: string;
 
   @ApiProperty({ enum: RecordStatus })
   @Column({ type: 'enum', enum: RecordStatus, default: RecordStatus.ACTIVE })

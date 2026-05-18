@@ -8,6 +8,13 @@ import { PartnerProductEntity } from '../partner-product/entities/partner-produc
 import { TenantEntity } from '../tenant/entities/tenant.entity';
 import { CreateIntegrationOrderDto } from './dto/create-integration-order.dto';
 
+export interface IntegrationCategoryResponse {
+  id: string;
+  slug: string;
+  name: string;
+  imageUrl: string | null;
+}
+
 export interface IntegrationProductResponse {
   id: string;
   partnerId: string;
@@ -21,6 +28,7 @@ export interface IntegrationProductResponse {
       id: string;
       slug: string;
       name: string;
+      imageUrl: string | null;
     };
   };
   tenantId: number | null;
@@ -79,6 +87,7 @@ export class IntegrationService {
           id: row.product.category.id,
           slug: row.product.category.slug,
           name: row.product.category.name,
+          imageUrl: row.product.category.imageUrl ?? null,
         },
       },
       tenantId: row.tenantId ?? null,
@@ -94,6 +103,31 @@ export class IntegrationService {
         status: row.partner.status,
       },
     }));
+  }
+
+  public async listCategories(
+    tenant: TenantEntity,
+  ): Promise<IntegrationCategoryResponse[]> {
+    const rows = await this.partnerProductRepository.find({
+      where: [{ tenantId: tenant.id }, { tenantId: IsNull() }],
+      order: { createdAt: 'DESC' },
+    });
+
+    const seen = new Set<string>();
+    const categories: IntegrationCategoryResponse[] = [];
+    for (const row of rows) {
+      const catId = row.product.category.id;
+      if (!seen.has(catId)) {
+        seen.add(catId);
+        categories.push({
+          id: catId,
+          slug: row.product.category.slug,
+          name: row.product.category.name,
+          imageUrl: row.product.category.imageUrl ?? null,
+        });
+      }
+    }
+    return categories.sort((a, b) => a.name.localeCompare(b.name));
   }
 
   public async placeOrder(

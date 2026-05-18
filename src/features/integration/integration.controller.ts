@@ -15,6 +15,7 @@ import { TenantEntity } from '../tenant/entities/tenant.entity';
 import { CreateIntegrationOrderDto } from './dto/create-integration-order.dto';
 import { TenantIntegrationAuthGuard } from './guards/tenant-integration-auth.guard';
 import {
+  IntegrationCategoryResponse,
   IntegrationProductResponse,
   IntegrationService,
 } from './integration.service';
@@ -26,6 +27,29 @@ type IntegrationRequest = Request & { tenant: TenantEntity };
 @Controller('integration')
 export class IntegrationController {
   public constructor(private readonly integrationService: IntegrationService) {}
+
+  @Get('categories')
+  @Public()
+  @UseGuards(TenantIntegrationAuthGuard)
+  @Throttle({ default: { limit: 120, ttl: 60_000 } })
+  @ApiOperation({ summary: 'List product categories for tenant integration' })
+  @ApiOkResponse({
+    schema: {
+      example: [
+        {
+          id: '2d799ac4-6d5c-4f43-b602-053cedf95c5b',
+          slug: 'electronics',
+          name: 'Electronics',
+          imageUrl: '/uploads/electronics.png',
+        },
+      ],
+    },
+  })
+  public listCategories(
+    @Req() req: IntegrationRequest,
+  ): Promise<IntegrationCategoryResponse[]> {
+    return this.integrationService.listCategories(req.tenant);
+  }
 
   @Get('products')
   @Public()
