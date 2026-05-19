@@ -6,12 +6,25 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomUUID } from 'crypto';
 import { DataSource, Repository } from 'typeorm';
+import {
+  buildPaginatedResult,
+  normalizePagination,
+} from '../../common/pagination/pagination.util';
+import { PaginatedResult } from '../../common/pagination/pagination.dto';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { ListOrdersQueryDto } from './dto/list-orders-query.dto';
 import { OrderEntity } from './entities/order.entity';
+import { OrderItemEntity } from './entities/order-item.entity';
 import { OrderStatus, StockMovementType } from '../../shared/enums';
 import { PartnerProductEntity } from '../partner-product/entities/partner-product.entity';
 import { StockMovementEntity } from '../partner-product/entities/stock-movement.entity';
 import { LoyaltyWebhookService } from '../loyalty-webhook/loyalty-webhook.service';
+import {
+  applyOrderListFilters,
+  createOrderListQueryBuilder,
+} from './order-query.util';
+
+const CSV_EXPORT_MAX_ROWS = 10_000;
 
 @Injectable()
 export class OrderService {
@@ -91,12 +104,112 @@ export class OrderService {
     });
   }
 
-  public findAll(): Promise<OrderEntity[]> {
-    return this.orderRepository.find({ order: { createdAt: 'DESC' } });
+  public async findAllPaginated(
+    query: ListOrdersQueryDto,
+  ): Promise<PaginatedResult<OrderEntity>> {
+    const { page, limit, skip, take } = normalizePagination(query);
+    const qb = applyOrderListFilters(
+      createOrderListQueryBuilder(this.orderRepository),
+      query,
+    );
+    const [data, total] = await qb.skip(skip).take(take).getManyAndCount();
+    return buildPaginatedResult(data, page, limit, total);
+  }
+
+  public async exportToCsv(query: ListOrdersQueryDto): Promise<string> {
+    const qb = applyOrderListFilters(
+      createOrderListQueryBuilder(this.orderRepository),
+      query,
+    );
+    const orders = await qb.take(CSV_EXPORT_MAX_ROWS).getMany();
+    return this.buildOrdersCsv(orders);
+  }
+
+  private buildOrdersCsv(orders: OrderEntity[]): string {
+    const headers = [
+      'Order #',
+      'Tenant',
+      'Partner',
+      'Status',
+      'Customer Name',
+      'Customer Phone',
+      'Customer Email',
+      'Products',
+      'Total (PKR)',
+      'Created Date (PKT)',
+      'Created Time (PKT)',
+    ];
+    const rows = orders.map((order) => {
+      const total = order.items.reduce(
+        (sum, item) => sum + Number(item.unitPrice) * item.quantity,
+        0,
+      );
+      const { date, time } = this.formatCreatedAtPkt(order.createdAt);
+      return [
+        order.orderNo,
+        order.tenant?.name ?? String(order.tenantId),
+        order.partner?.name ?? order.partnerId,
+        order.status,
+        order.customerName ?? '',
+        order.customerPhone ?? '',
+        order.customerEmail ?? '',
+        this.formatOrderProducts(order.items),
+        total.toFixed(2),
+        date,
+        time,
+      ];
+    });
+    return [headers, ...rows]
+      .map((row) => row.map((cell) => this.escapeCsvCell(cell)).join(','))
+      .join('\n');
+  }
+
+  private formatOrderProducts(items: OrderItemEntity[]): string {
+    if (!items.length) return '';
+    return items
+      .map((item) => {
+        const name = item.product?.name ?? item.productId;
+        const sku = item.product?.sku ? ` [${item.product.sku}]` : '';
+        return `${name}${sku} x${item.quantity}`;
+      })
+      .join('; ');
+  }
+
+  private formatCreatedAtPkt(createdAt: Date): { date: string; time: string } {
+    const date = new Intl.DateTimeFormat('en-PK', {
+      timeZone: 'Asia/Karachi',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }).format(createdAt);
+
+    const time = new Intl.DateTimeFormat('en-PK', {
+      timeZone: 'Asia/Karachi',
+      hour: 'numeric',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+    }).format(createdAt);
+
+    return { date, time };
+  }
+
+  private escapeCsvCell(value: string): string {
+    if (/[",\n\r]/.test(value)) {
+      return `"${value.replace(/"/g, '""')}"`;
+    }
+    return value;
   }
 
   public async findOne(id: string): Promise<OrderEntity> {
-    const order = await this.orderRepository.findOneBy({ id });
+    const order = await this.orderRepository.findOne({
+      where: { id },
+      relations: {
+        tenant: true,
+        partner: true,
+        items: { product: true },
+      },
+    });
     if (!order) throw new NotFoundException(`Order ${id} not found`);
     return order;
   }
