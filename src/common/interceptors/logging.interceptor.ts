@@ -28,9 +28,13 @@ export class LoggingInterceptor implements NestInterceptor {
             LoggingInterceptor.name,
           );
         },
-        error: (error: Error) => {
+        error: (error: Error & { getResponse?: () => unknown }) => {
+          const detail =
+            typeof error.getResponse === 'function'
+              ? JSON.stringify(error.getResponse())
+              : error.message;
           this.logger.error(
-            `${request.method} ${request.url} ${String(Date.now() - startedAt)}ms`,
+            `${request.method} ${request.url} ${String(Date.now() - startedAt)}ms — ${detail}`,
             error.stack,
             LoggingInterceptor.name,
           );

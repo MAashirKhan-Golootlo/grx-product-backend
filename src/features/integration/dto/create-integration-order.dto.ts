@@ -18,6 +18,7 @@ export class CreateIntegrationOrderItemDto {
   productId!: string;
 
   @ApiProperty({ example: 1 })
+  @Type(() => Number)
   @IsInt()
   @Min(1)
   quantity!: number;
@@ -28,6 +29,7 @@ export class CreateIntegrationOrderItemDto {
     description: 'Optional; defaults to partner price for this product/tenant',
   })
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   @Min(0)
   unitPrice?: number;
