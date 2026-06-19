@@ -76,6 +76,10 @@ class EnvironmentVariables {
   @IsOptional()
   @IsString()
   CORS_ORIGIN?: string;
+
+  @IsOptional()
+  @IsString()
+  GRX_PUBLIC_BASE_URL?: string;
 }
 
 export function validateEnv(

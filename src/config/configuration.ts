@@ -33,4 +33,11 @@ export default (): Record<string, unknown> => ({
     webhookSecret: process.env.LOYALTY_WEBHOOK_SECRET ?? '',
     webhookTimeoutMs: process.env.LOYALTY_WEBHOOK_TIMEOUT_MS ?? '10000',
   },
+  uploads: {
+    // Fixed public base URL for serving uploaded files (e.g. http://192.168.1.50:4001).
+    // When unset, falls back to deriving it from the request's Host header — fine for
+    // a single-machine dev loop, but bakes in whatever host the uploader happened to
+    // use (localhost, a LAN IP, etc.) permanently into the stored URL.
+    publicBaseUrl: process.env.GRX_PUBLIC_BASE_URL?.trim() || null,
+  },
 });

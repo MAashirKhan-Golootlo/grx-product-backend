@@ -6,6 +6,7 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ApiBody, ApiConsumes, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Request } from 'express';
@@ -43,6 +44,8 @@ const imageFileFilter = (
 @ApiTags('Uploads')
 @Controller('uploads')
 export class UploadController {
+  constructor(private readonly configService: ConfigService) {}
+
   @Post('image')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -100,7 +103,10 @@ export class UploadController {
       throw new BadRequestException('Image file is required');
     }
 
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const configuredBaseUrl = this.configService.get<string | null>(
+      'uploads.publicBaseUrl',
+    );
+    const baseUrl = configuredBaseUrl || `${req.protocol}://${req.get('host')}`;
     return {
       filename: file.filename,
       url: `${baseUrl}/uploads/${file.filename}`,
