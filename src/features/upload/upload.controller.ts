@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Controller,
+  Logger,
   Post,
   Req,
   UploadedFile,
@@ -44,6 +45,8 @@ const imageFileFilter = (
 @ApiTags('Uploads')
 @Controller('uploads')
 export class UploadController {
+  private readonly logger = new Logger(UploadController.name);
+
   constructor(private readonly configService: ConfigService) {}
 
   @Post('image')
@@ -107,9 +110,23 @@ export class UploadController {
       'uploads.publicBaseUrl',
     );
     const baseUrl = configuredBaseUrl || `${req.protocol}://${req.get('host')}`;
+    const url = `${baseUrl}/uploads/${file.filename}`;
+
+    // Temporary debug — remove after confirming GRX_PUBLIC_BASE_URL on live
+    this.logger.log(
+      `[upload] GRX_PUBLIC_BASE_URL env = ${process.env.GRX_PUBLIC_BASE_URL}`,
+    );
+    this.logger.log(
+      `[upload] config uploads.publicBaseUrl = ${configuredBaseUrl}`,
+    );
+    this.logger.log(`[upload] req.protocol = ${req.protocol}`);
+    this.logger.log(`[upload] req.host = ${req.get('host')}`);
+    this.logger.log(`[upload] final baseUrl = ${baseUrl}`);
+    this.logger.log(`[upload] final url = ${url}`);
+
     return {
       filename: file.filename,
-      url: `${baseUrl}/uploads/${file.filename}`,
+      url,
     };
   }
 }
