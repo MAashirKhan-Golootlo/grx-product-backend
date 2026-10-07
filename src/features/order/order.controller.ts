@@ -63,6 +63,6 @@ export class OrderController {
     @Param('id') id: string,
     @Body() dto: UpdateOrderStatusDto,
   ): Promise<OrderEntity> {
-    return this.orderService.updateStatus(id, dto.status);
+    return this.orderService.updateStatus(id, dto);
   }
 }

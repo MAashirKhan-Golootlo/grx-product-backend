@@ -9,7 +9,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { OrderStatus } from '../../../shared/enums';
+import { OrderStatus, ReturnDisposition } from '../../../shared/enums';
 import { PartnerEntity } from '../../partner/entities/partner.entity';
 import { TenantEntity } from '../../tenant/entities/tenant.entity';
 import { OrderItemEntity } from './order-item.entity';
@@ -33,6 +33,18 @@ export class OrderEntity {
   @ApiProperty({ enum: OrderStatus })
   @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.CREATED })
   status!: OrderStatus;
+
+  @ApiProperty({ required: false, enum: ReturnDisposition })
+  @Column({ type: 'varchar', length: 30, nullable: true })
+  returnDisposition?: ReturnDisposition | null;
+
+  @ApiProperty({ required: false, example: 'QUALITY_ISSUE' })
+  @Column({ type: 'varchar', length: 80, nullable: true })
+  returnReasonCode?: string | null;
+
+  @ApiProperty({ required: false })
+  @Column({ type: 'text', nullable: true })
+  returnReasonText?: string | null;
 
   @ApiProperty({ required: false })
   @Column({ type: 'varchar', nullable: true })

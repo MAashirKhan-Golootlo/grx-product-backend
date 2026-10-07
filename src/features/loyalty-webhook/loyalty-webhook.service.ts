@@ -11,6 +11,9 @@ export type LoyaltyOrderStatusPayload = {
   previousStatus: string;
   status: string;
   occurredAt: string;
+  returnReasonCode?: string;
+  returnReasonText?: string;
+  returnDisposition?: string;
 };
 
 @Injectable()
@@ -44,6 +47,18 @@ export class LoyaltyWebhookService {
       status: order.status,
       occurredAt: new Date().toISOString(),
     };
+
+    if (order.status === OrderStatus.RETURNED) {
+      if (order.returnReasonCode) {
+        payload.returnReasonCode = order.returnReasonCode;
+      }
+      if (order.returnReasonText) {
+        payload.returnReasonText = order.returnReasonText;
+      }
+      if (order.returnDisposition) {
+        payload.returnDisposition = order.returnDisposition;
+      }
+    }
 
     const timeoutMs = Number(
       this.configService.get<string>('loyalty.webhookTimeoutMs') ?? '10000',

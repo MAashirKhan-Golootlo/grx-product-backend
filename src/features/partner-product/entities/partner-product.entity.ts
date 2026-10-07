@@ -37,6 +37,11 @@ export class PartnerProductEntity {
   @Column({ type: 'int', default: 0 })
   availableStock!: number;
 
+  /** Non-sellable returned / damaged stock (STORE-001). */
+  @ApiProperty()
+  @Column({ type: 'int', default: 0 })
+  quarantineStock!: number;
+
   @ApiProperty()
   @Column({ type: 'decimal', precision: 12, scale: 2 })
   partnerPrice!: number;
